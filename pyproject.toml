@@ -3,7 +3,7 @@ requires = ["setuptools>=78.1.1", "wheel", "Cython", "setuptools-scm>=8.0"]
 
 [project]
 name = "granite-tsfm"
-requires-python = ">=3.9,<3.13"
+requires-python = ">=3.12,<3.13"
 # version = "0.0.1"
 dynamic = ["version"]
 authors = [{ name = "IBM" }]
@@ -21,9 +21,10 @@ dependencies = [
     "transformers[torch]==4.56.0",
     "datasets",
     "deprecated",
-    "urllib3>=1.26.19",            # see https://github.com/urllib3/urllib3/security/advisories/GHSA-34jh-p97f-mpxf
+    "urllib3>=1.26.19", # see https://github.com/urllib3/urllib3/security/advisories/GHSA-34jh-p97f-mpxf
     "numpy<3",
     "torch<3",
+    "pfun-cma-model",
 ]
 
 [tool.setuptools]
@@ -97,3 +98,6 @@ skip-magic-trailing-comma = false
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
+
+[tool.uv.sources]
+pfun-cma-model = { git = "https://github.com/pfun-health/pfun-cma-model.git" }

@@ -1,0 +1,5 @@
+Strategy,Architecture,Complexity,Data Requirement,Interpretability,Best For,Implementation Effort,Expected RMSE Improvement
+1. Residual Correction,G = CMA_baseline + TTM_correction,Low,500-1000 samples,Very High,Most practical scenarios,Minimal,15-25% vs baselines
+2. Exogenous Features,"G = TTM(glucose_hist, CMA_features)",Low-Medium,1000-2000 samples,High,Leveraging TTM's exogenous capability,Low,15-30% vs baselines
+3. Physics-Informed Loss,G = TTM(glucose) with physics constraints,Medium,2000-5000 samples,Medium-High,Safety-critical applications,Moderate,20-30% vs baselines
+4. Multi-Stage Training,G = TTM_pretrained(CMA) → finetune(data),Medium-High,<500 samples,High,Minimal data availability,High,10-20% vs baselines
