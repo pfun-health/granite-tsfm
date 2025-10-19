@@ -1,4 +1,4 @@
-[I#!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 Hybrid TTM + PFun CMA Model Implementation
 Strategy 1: Residual Correction (Recommended)
@@ -494,6 +494,31 @@ class HybridTTMCMAModel:
 # =============================================================================
 # Example Usage
 # =============================================================================
+def generate_sythetic_data():
+    np.random.seed(42)
+    # Generate datetime vector at 5-minute intervals over 24 hours starting from a base date
+    from datetime import datetime, timedelta
+    base_datetime = datetime(2025, 10, 18, 0, 0, 0)
+    interval_minutes = 5
+    n_points = 288  # 24*60/5=288
+    time_points_dt = [base_datetime + timedelta(minutes=i * interval_minutes) for i in range(n_points)]
+    # For compatibility, also keep decimal hours (for circadian simulation, etc.)
+    decimal_times = [dt.hour + dt.minute/60.0 + dt.second/3600.0 for dt in time_points_dt]
+
+    # Simulate glucose with circadian pattern + meals
+    base_glucose = 100 + 20 * np.sin(2 * np.pi * (np.array(decimal_times) - 4) / 24)
+    meal_effects = (
+        30 * np.exp(-((np.array(decimal_times) - 7)**2) / 2) +  # Breakfast
+        35 * np.exp(-((np.array(decimal_times) - 12)**2) / 2) +  # Lunch
+        40 * np.exp(-((np.array(decimal_times) - 18)**2) / 2)    # Dinner
+    )
+    glucose_data = base_glucose + meal_effects + np.random.normal(0, 5, len(decimal_times))
+    sample_data = pd.DataFrame({
+        'ts_local': time_points_dt,      # datetime vector for local time
+        'time_decimal': decimal_times,   # decimal hours, if needed for compatibility
+        'glucose_mgdl': glucose_data
+    })
+    return sample_data
 
 def example_workflow():
     """
@@ -508,22 +533,7 @@ def example_workflow():
     # In practice, load from CSV: pd.read_csv('patient_cgm.csv')
     
     # Synthetic sample data for demonstration
-    np.random.seed(42)
-    time_points = np.linspace(0, 24, 288)  # 5-minute intervals over 24 hours
-    
-    # Simulate glucose with circadian pattern + meals
-    base_glucose = 100 + 20 * np.sin(2 * np.pi * (time_points - 4) / 24)
-    meal_effects = (
-        30 * np.exp(-((time_points - 7)**2) / 2) +  # Breakfast
-        35 * np.exp(-((time_points - 12)**2) / 2) +  # Lunch
-        40 * np.exp(-((time_points - 18)**2) / 2)    # Dinner
-    )
-    glucose_data = base_glucose + meal_effects + np.random.normal(0, 5, len(time_points))
-    
-    sample_data = pd.DataFrame({
-        'time_decimal': time_points,  # @todo: time vector should be available as datetime
-        'glucose_mgdl': glucose_data
-    })
+    sample_data = generate_sythetic_data()
     
     print(f"  Loaded {len(sample_data)} data points")
     print(f"  Time range: {sample_data['time_decimal'].min():.1f} to "
